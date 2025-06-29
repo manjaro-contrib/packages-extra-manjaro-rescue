@@ -1,17 +1,17 @@
 # Maintainer: Stefano Capitani <stefanoatmanjarodotorg>
 
 pkgname=manjaro-rescue
-pkgver=2.0
+pkgver=2.1
 pkgrel=1
 arch=('any')
-license=('GPL-3.0-or-later')
+license=('GPL3')
 url='https://gitlab.manjaro.org/ste74/manjaro-rescue'
 pkgdesc="Restore your installed system"
 depends=('zenity' 'mkinitcpio' 'grub' 'os-prober' 'pamac-cli' 'pacman' 'util-linux' 'manjaro-tools-base' 'st'
 		'manjaro-log-helper' 'bmenu')
 optdepends=('timeshft: System restore utility for Linux')
 source=("$url/-/archive/$pkgver/$pkgname-$pkgver.tar.gz")
-sha256sums=('2174458dfad2eec5f1752cdb13831d0968d713a0274071cd7adb633d68dcfedc')
+sha256sums=('46e6dde1f0c33c3cd486869f58cf26dc6c7c9dc206881b81aaca1f67a0c14e6b')
 
 package() {
 		cp -rf $srcdir/$pkgname-$pkgver/usr $pkgdir/
