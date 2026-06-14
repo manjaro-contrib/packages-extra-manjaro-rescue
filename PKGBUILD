@@ -1,23 +1,34 @@
-# Maintainer: Stefano Capitani <stefanoatmanjarodotorg>
+# Maintainer: Stefano Capitani <stefano@manjaro.org>
 
 pkgname=manjaro-rescue
-pkgver=2.1.1
-pkgrel=2
+pkgver=3.0.0
+pkgrel=1
+pkgdesc="Professional system restore utility for Manjaro Linux"
 arch=('any')
+url="https://codeberg.org/Ste74/manjaro-rescue"
 license=('GPL-3.0-or-later')
-url='https://gitlab.manjaro.org/ste74/manjaro-rescue'
-pkgdesc="Restore your installed system"
-depends=('zenity' 'mkinitcpio' 'grub' 'os-prober' 'pamac-cli' 'pacman' 'util-linux' 'manjaro-tools-base' 'st'
-		'manjaro-log-helper' 'bmenu')
-optdepends=('timeshift: System restore utility for Linux')
-source=("$url/-/archive/$pkgver/$pkgname-$pkgver.tar.gz")
-sha256sums=('0b41f950e025bf9623844c4efdc793dcb6071756652d16932f5ce7bd17d65040')
+depends=('python' 'python-gobject' 'gtk4' 'libadwaita' 'os-prober' 'grub' 'polkit' 'manjaro-tools-base')
+makedepends=('git' 'gettext')
+optdepends=('timeshift: System restore utility for Linux'
+	    'manjaro-log-helper: Gathers selected system logs and optionally sends them to the internet'
+	    'bmenu: Bash scripts providing a collection of terminal applications in a simple UI')
+source=("$url/archive/$pkgver.tar.gz")
+sha256sums=('95fb2856bad3e390b7b62ac23d589a24602d72da85d282919f34c1a83bb2b9a7')
 
 package() {
-		cp -rf $srcdir/$pkgname-$pkgver/usr $pkgdir/
+  cd "${srcdir}/${pkgname}"
 
-		chmod 755 $pkgdir/usr/bin/manjaro-rescue
-		chmod 755 $pkgdir/usr/share/manjaro/grub-restore/grub-apply-efi
-		chmod 755 $pkgdir/usr/share/manjaro/grub-restore/grub-apply-legacy
-		chmod 755 $pkgdir/usr/share/manjaro/grub-restore/grub-restore
+  install -d "${pkgdir}/usr/lib/${pkgname}"
+  install -d "${pkgdir}/usr/bin"
+  install -d "${pkgdir}/usr/share/applications"
+  install -d "${pkgdir}/usr/share/icons/hicolor/scalable/apps"
+
+  cp -r backend utils locale "${pkgdir}/usr/lib/${pkgname}/"
+  [ -d icons ] && cp -r icons "${pkgdir}/usr/lib/${pkgname}/"
+  install -m755 main.py "${pkgdir}/usr/lib/${pkgname}/"
+  install -m644 window.ui "${pkgdir}/usr/lib/${pkgname}/"
+
+  ln -s "/usr/lib/${pkgname}/main.py" "${pkgdir}/usr/bin/${pkgname}"
+  ln -s "/usr/lib/${pkgname}/icons/hicolor/scalable/apps/${pkgname}.svg" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/${pkgname}.svg"
+  install -m644 "${pkgname}.desktop" "${pkgdir}/usr/share/applications/"
 }
