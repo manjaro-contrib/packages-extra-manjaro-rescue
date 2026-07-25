@@ -7,28 +7,44 @@ pkgdesc="Professional system restore utility for Manjaro Linux"
 arch=('any')
 url="https://codeberg.org/Ste74/manjaro-rescue"
 license=('GPL-3.0-or-later')
-depends=('python' 'python-gobject' 'gtk4' 'libadwaita' 'os-prober' 'grub' 'polkit' 'manjaro-tools-base')
-makedepends=('git' 'gettext')
-optdepends=('timeshift: System restore utility for Linux'
-	    'manjaro-log-helper: Gathers selected system logs and optionally sends them to the internet'
-	    'bmenu: Bash scripts providing a collection of terminal applications in a simple UI')
-source=("$url/archive/$pkgver.tar.gz")
-sha256sums=('95fb2856bad3e390b7b62ac23d589a24602d72da85d282919f34c1a83bb2b9a7')
+depends=(
+  'grub'
+  'gtk4'
+  'libadwaita'
+  'manjaro-tools-base'
+  'os-prober'
+  'polkit'
+  'python'
+  'python-gobject'
+)
+makedepends=('git')
+optdepends=(
+  'bmenu: Bash scripts providing a collection of terminal applications in a simple UI'
+  'manjaro-log-helper: Gathers selected system logs and optionally sends them to the internet'
+  'timeshift: System restore utility for Linux'
+)
+source=("${pkgname}-${pkgver}.tar.gz::$url/archive/$pkgver.tar.gz")
+noextract=("${pkgname}-${pkgver}.tar.gz")
+sha256sums=('aa92e600b5305bbc9e47de38eff1eb41254dc953d6036e0218fce95d21ec6379')
+
+prepare() {
+  mkdir -p "${pkgname}-${pkgver}"
+  bsdtar xf "${pkgname}-${pkgver}.tar.gz" --strip-components 1 -C "${pkgname}-${pkgver}"
+}
 
 package() {
-  cd "${srcdir}/${pkgname}"
+  cd "${pkgname}-${pkgver}"
 
-  install -d "${pkgdir}/usr/lib/${pkgname}"
   install -d "${pkgdir}/usr/bin"
-  install -d "${pkgdir}/usr/share/applications"
   install -d "${pkgdir}/usr/share/icons/hicolor/scalable/apps"
 
   cp -r backend utils locale "${pkgdir}/usr/lib/${pkgname}/"
-  [ -d icons ] && cp -r icons "${pkgdir}/usr/lib/${pkgname}/"
-  install -m755 main.py "${pkgdir}/usr/lib/${pkgname}/"
-  install -m644 window.ui "${pkgdir}/usr/lib/${pkgname}/"
+  [ -d icons ] && cp -a icons "${pkgdir}/usr/lib/${pkgname}/"
+  install -Dm755 main.py "${pkgdir}/usr/lib/${pkgname}/"
+  install -Dm644 window.ui "${pkgdir}/usr/lib/${pkgname}/"
 
   ln -s "/usr/lib/${pkgname}/main.py" "${pkgdir}/usr/bin/${pkgname}"
-  ln -s "/usr/lib/${pkgname}/icons/hicolor/scalable/apps/${pkgname}.svg" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/${pkgname}.svg"
-  install -m644 "${pkgname}.desktop" "${pkgdir}/usr/share/applications/"
+  ln -s "/usr/lib/${pkgname}/icons/hicolor/scalable/apps/${pkgname}.svg" \
+    "${pkgdir}/usr/share/icons/hicolor/scalable/apps/${pkgname}.svg"
+  install -Dm644 "${pkgname}.desktop" "${pkgdir}/usr/share/applications/"
 }
